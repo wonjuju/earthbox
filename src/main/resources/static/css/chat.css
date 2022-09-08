@@ -1,0 +1,139 @@
+body {
+	overflow: visible;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
+.container h1 {
+	text-align: left;
+	padding: 5px 5px 5px 15px;
+	color: #FFBB00;
+	border-left: 3px solid #FFBB00;
+	margin-bottom: 20px;
+}
+
+.chating {
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+}
+
+.chating .others {
+	color: #FFE400;
+	text-align: left;
+}
+
+input {
+	width: 330px;
+	height: 25px;
+}
+
+#yourMsg {
+	display: none;
+}
+
+.inputTable {
+	position: fixed;
+	bottom: 70px;
+	width: 100%;
+	padding: 2% 5%;
+	background-color: white;
+	z-index: 3;
+    min-width: 430px;
+}
+
+.chat-form {
+	width: 78%;
+	display: inline;
+	
+}
+
+section {
+	min-width: 400px;
+	max-width: 480px;
+	margin: 50px auto;
+	    padding: 5% 5% 10%;
+	    
+}
+
+section div {
+	max-width: 255px;
+	word-wrap: break-word;
+	margin-bottom: 20px;
+	line-height: 24px;
+}
+
+.clear {
+	clear: both;
+}
+
+.from-me {
+	position: relative;
+	padding: 10px 20px;
+	color: white;
+	background: #599555;
+	border-radius: 25px;
+	float: right;
+}
+
+.from-me:before {
+	content: "";
+	position: absolute;
+	z-index: -1;
+	bottom: -2px;
+	right: -7px;
+	height: 20px;
+	border-right: 20px solid #599555;
+	border-bottom-left-radius: 16px 14px;
+	-webkit-transform: translate(0, -2px);
+}
+
+.from-me:after {
+	content: "";
+	position: absolute;
+	z-index: 1;
+	bottom: -2px;
+	right: -56px;
+	width: 26px;
+	height: 20px;
+	background: white;
+	border-bottom-left-radius: 10px;
+	-webkit-transform: translate(-30px, -2px);
+}
+
+.from-them {
+	position: relative;
+	padding: 10px 20px;
+	background: #E5E5EA;
+	border-radius: 25px;
+	color: black;
+	float: left;
+}
+
+.from-them:before {
+	content: "";
+	position: absolute;
+	z-index: 2;
+	bottom: -2px;
+	left: -7px;
+	height: 20px;
+	border-left: 20px solid #E5E5EA;
+	border-bottom-right-radius: 16px 14px;
+	-webkit-transform: translate(0, -2px);
+}
+
+.from-them:after {
+	content: "";
+	position: absolute;
+	z-index: 3;
+	bottom: -2px;
+	left: 4px;
+	width: 26px;
+	height: 20px;
+	background: white;
+	border-bottom-right-radius: 10px;
+	-webkit-transform: translate(-30px, -2px);
+}

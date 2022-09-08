@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.forus.mapper.ChatMapper">
+
+	<!--  채팅방 추가 하기 -->
+	<insert id="addChatRoom">
+		insert into chattingroom_tb(cr_title, g_seq, user_id)
+		values (
+			(select seller_id 
+			 from goods_tb 
+			 where g_seq = #{g_seq}) , #{g_seq}, #{user_id}
+		)
+	</insert>
+	
+	<!--  채팅방 정보 가져오기 -->
+	<select id="cr_seqSelect" resultType="com.forus.domain.chatRoomVO">
+		select * from chattingroom_tb where g_seq = #{g_seq} and user_id = #{user_id}
+	</select>
+	
+	<!-- 채팅방 리스트 가져오기 -->
+	<select id="roomList" resultType="com.forus.domain.chatRoomVO">
+		select c.cr_seq, u.user_nick as cr_title, c.g_seq, c.user_id,(TIMESTAMPDIFF (minute,c.cr_opendate,now())) as cr_opendate, g.g_img
+		from chattingroom_tb c, user_tb u, goods_tb g
+		where c.user_id = #{user_id} and c.cr_title = u.user_id and c.g_seq = g.g_seq
+		union 
+		select c.cr_seq, c.cr_title, c.g_seq, u.user_nick as user_id ,(TIMESTAMPDIFF (minute,c.cr_opendate,now())) as cr_opendate, g.g_img
+		from chattingroom_tb c, user_tb u, goods_tb  g
+		where c.cr_title = #{user_id} and c.user_id = u.user_id and c.g_seq = g.g_seq
+		order by cr_opendate
+	</select>
+
+	<!--  채팅 내용 저장 -->
+	<insert id="chatInsert" parameterType="com.forus.domain.chatVO">
+		insert into chatting_tb(talker_id, talk_content, talk_time, cr_seq)
+		values(#{talker_id}, #{talk_content},now(),#{cr_seq})
+	</insert>
+	
+	
+	<!--  채팅 내용 가져오기 -->
+	<select id="chatList" resultType="com.forus.domain.chatVO">
+		select * from chatting_tb where cr_seq = #{cr_seq}
+	</select>
+
+</mapper>

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.forus.mapper.GoodsMapper">
+	
+	<select id="goodsList" parameterType="String" resultType="com.forus.domain.goodsListVO">
+		select g.g_seq, g_name, g_img, g_price, sum(w.wish_yn) as wish_cnt
+		from goods_tb g, wishlist_tb w 
+		where loc_seq in (
+		        select loc_seq 
+		        from g_location_tb l, (
+						select v_machine_seq 
+						from v_machine_tb 
+						where v_machine_addr = #{user_adrr} ) v
+		        where l.v_machine_seq= v.v_machine_seq)
+		        and g_status = '판매' and g.g_seq = w.g_seq
+		group by g.g_seq
+	</select>
+
+
+	<select id="selectAptName" resultType="String">
+		select apt_name from v_machine_tb where v_machine_addr =#{user_add}	
+	</select>
+	
+	
+	<select id="goodsInfo" parameterType="int" resultType="com.forus.domain.goodsVO">
+		select g.g_seq, c.gc_name, g.g_name, g.g_info, g.g_img, g.g_price, g.seller_id 
+		from goods_tb g, g_category_tb c 
+		where g.g_seq = #{g_seq} and c.gc_seq = g.gc_seq 
+	</select>
+
+	<!-- 상품 등록하기 -->
+	<insert id="goodsInsert" parameterType="com.forus.domain.goodsVO">
+		insert into goods_tb(gc_seq,loc_seq,g_name,g_info,g_price, seller_id,g_img) 
+		values(
+   			 (select gc_seq 
+   			  from g_category_tb 
+   			  where gc_name =#{gc_name}),
+   			  #{loc_seq}, #{g_name}, #{g_info}, #{g_price}, #{seller_id},#{g_img})
+	</insert>
+	
+	<!--  상품할 loc_seq불러오기 -->
+	<select id="loc_seqSelect" parameterType="String" resultType="int">
+		select location_tb.loc_seq
+  		from (
+    		select loc_seq 
+    		from g_location_tb, (
+      			select v_machine_seq
+      			from v_machine_tb
+				where v_machine_addr = #{user_addr}) as addr
+    		where g_location_tb.v_machine_seq = addr.v_machine_seq) as location_tb
+  		where location_tb.loc_seq not in (
+    		select loc_seq  
+    		from goods_tb 
+    		where g_status in ('대기','예약','구매','판매')) limit 1
+	</select>
+	
+	
+	<!--  자판기 비밀번호 변경 -->
+	<update id = "machinePwUpdate" parameterType="com.forus.domain.gLocationVO">
+		update g_location_tb set v_machine_pw = #{v_machine_pw} where loc_seq = #{loc_seq}
+	</update>
+
+
+	<!-- 물건 파는 사람의 nickname 불러오기 -->
+	<select id="seller_nickSelect" resultType="String">
+		select user_nick from user_tb where user_id = #{seller_id}
+	</select>
+	
+	
+	<!-- 물건 삭제 -->
+	<delete id="goodsDelete">
+		delete from goods_tb where g_seq= #{g_seq} and g_status = '대기'
+	</delete>
+	
+	
+	<!--  판매 중인 내역 불러오기 -->
+	<select id="goodsSaleList" resultType="com.forus.domain.goodsListVO">
+		select * from goods_tb where seller_id = #{user_id} and g_status in ('대기','판매')
+	</select>
+	
+	<!--  판매 완료 내역  -->
+	<select id="goodsFinishList" resultType="com.forus.domain.goodsListVO">
+		select * from goods_tb where seller_id = #{user_id} and g_status in ('예약','완료')
+	</select>
+	
+	
+	
+	<!-- 구매 내역 -->
+	<select id = "goodsPurchaseList" resultType="com.forus.domain.goodsListVO">
+		select * from goods_tb where consumer_id = #{user_id}
+	</select>	
+	
+	<!--  기본 wishList 등록 -->
+	<insert id="wishInsert" parameterType="com.forus.domain.wishListVO">
+		insert into wishlist_tb(g_seq, user_id,wish_yn) values (#{g_seq},#{user_id},#{wish_yn})
+	</insert>
+	
+	<!--  g_seq 번호 불러오기 -->
+	<select id="g_seqSelect" parameterType="com.forus.domain.goodsVO" resultType="int">
+		select g_seq from goods_tb where loc_seq =#{loc_seq} and seller_id = #{seller_id}
+	</select>
+	
+	<!--  제품 구매 -->
+	<update id="goodsCosumerUpdate" parameterType="com.forus.domain.goodsPuchaseVO">
+		update goods_tb set g_status = '구매', consumer_id = #{consumer_id} where g_seq = #{g_seq}
+	</update>
+	
+	<!-- g_locationVO 불러오기 -->
+	<select id="gLocationSelect" resultType="com.forus.domain.resultlocationVO" parameterType="int">
+		select g.g_name, v.apt_name, l.v_machine_space_no,l.v_machine_pw
+		from g_location_tb l, v_machine_tb v,(
+			select loc_seq, g_name 
+			from goods_tb 
+			where g_seq = #{g_seq}) as g
+		where l.loc_seq = g.loc_seq and l.v_machine_seq = v.v_machine_seq
+	</select>
+
+	<!--  상품 구매 할때 데이터 가져오기  -->
+	<select id="buySelect" resultType="com.forus.domain.buyListVO">
+		select g_seq, g_price, g_img, g_name from goods_tb where g_seq = #{g_seq}
+	</select>
+	
+	<!-- 회원이 찜한 제품 리스트만 가져오기 -->
+	<select id="likeList" parameterType="String" resultType="com.forus.domain.goodsListVO">
+		select g.g_seq, g.g_name, g.g_img, g.g_price, sum(w.wish_yn) as wish_cnt
+		from goods_tb g,(
+			select g_seq,wish_yn 
+			from wishlist_tb 
+			where user_id = #{user_id} and wish_yn = 1) as w
+		where g.g_seq = w.g_seq
+		group by g.g_seq;
+	</select>	
+	
+	<!-- 카테고리 별 데이터 가져오기  -->
+	<select id="gcList" resultType="com.forus.domain.goodsListVO">
+		select g.g_seq, g_name, g_img, g_price, sum(w.wish_yn) as wish_cnt
+		from goods_tb g, wishlist_tb w, (
+		        select gc_seq 
+		        from g_category_tb
+		        where gc_name = #{gc_name}) as c
+		where loc_seq in (
+		        select loc_seq 
+		        from g_location_tb l, (
+						select v_machine_seq 
+		        		from v_machine_tb 
+						where v_machine_addr = #{user_addr} ) v
+		        where l.v_machine_seq= v.v_machine_seq)
+		        and g_status = '판매' and g.g_seq = w.g_seq and g.gc_seq = c.gc_seq
+		group by g.g_seq
+	</select>
+	
+	<!-- 채팅을 위해 판매자 닉네임과 사진 가져오기 -->
+	<select id="goodsRoom" resultType="com.forus.domain.goodsVO">
+		select g.g_seq, g.g_name, g.g_img, (u.user_nick) as seller_nick 
+		from goods_tb g, (
+			select user_nick, user_id
+			from user_tb) as u
+		where g_seq = #{g_seq} and u.user_id = g.seller_id;
+	</select>
+	
+	
+</mapper>

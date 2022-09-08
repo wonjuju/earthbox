@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.forus.mapper.CommunityMapper">
+
+
+	<select id="postList" resultType="com.forus.domain.CommunityVO">
+	select c.article_seq, c.article_content,(TIMESTAMPDIFF (minute,c.article_date,now())) as article_date,c.article_file, (u.user_nick) as user_id, c.article_category
+	from community_tb c , user_tb u,(
+	        select v_machine_seq, apt_name 
+	    	from v_machine_tb 
+	    	where v_machine_addr = #{user_addr}) as v
+	where c.user_id = u.user_id and c.v_machine_seq = v.v_machine_seq 
+	group by c.article_seq
+	order by article_date
+	</select>
+
+	<!-- 게시글 등록하기 -->
+	<insert id="articleInsert" parameterType="com.forus.domain.CommunityVO">
+		insert into community_tb(article_content, article_file, article_category, user_id, v_machine_seq) values(
+		#{article_content},#{article_file}, #{article_category}, #{user_id}, #{v_machine_seq})
+	</insert>
+	
+	<!-- 게시글 등록하기 위해 v_mahcine_seq 번호 알아오기 -->
+	<select id="machine_seqSelect" parameterType="String" resultType="int">
+		select v_machine_seq from v_machine_tb where v_machine_addr=#{user_addr}
+	</select>
+	
+	<!-- article_seq 번호 가져오기  -->
+	<select id="art_seqSelect" parameterType="com.forus.domain.CommunityVO" resultType="int">
+		select article_seq from community_tb where user_id = #{user_id} and article_content= #{article_content}
+	</select>
+
+	
+	<!-- 커뮤니티 상세정보 -->
+	<select id ="communityInfo" resultType="com.forus.domain.CommunityVO">
+		select * from community_tb where article_seq = #{article_seq}
+	</select>
+
+	<!-- 커뮤니티 댓글 정보 가져오기 -->
+	<select id="commentList" resultType="com.forus.domain.commentVO">
+		select * from comment_tb where article_seq = #{article_seq}
+	</select>
+	
+	<!-- 댓글 insert 하기  -->
+	<insert id="commentInsert" parameterType="com.forus.domain.commentVO">
+		insert into comment_tb(article_seq, c_like, cmt_content, cmt_date, user_id)
+		values(#{article_seq}, 0,#{cmt_content}, now(), #{user_id})
+	</insert>
+	
+	
+	<!-- 게시글 삭제 -->
+	<delete id="deleteCommunity">
+		delete from community_tb where article_seq = #{article_seq}	
+	</delete>
+	
+</mapper> 

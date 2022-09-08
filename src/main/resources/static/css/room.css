@@ -1,0 +1,87 @@
+body {
+	overflow: visible;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
+h3 {
+	text-align: left;
+	padding: 5px 5px 5px 15px;
+	color: black;
+	margin-bottom: 20px;
+}
+
+.roomContainer {
+	overflow: auto;
+	padding: 12% 0%;
+}
+
+.roomList {
+	border: none;
+}
+
+.roomList th {
+	border: 1px solid #FFBB00;
+	background-color: #fff;
+	color: #FFBB00;
+}
+
+.roomList td {
+	border: 1px solid #FFBB00;
+	background-color: #fff;
+	text-align: left;
+	color: #FFBB00;
+}
+
+.roomList .num {
+	width: 75px;
+	text-align: center;
+}
+
+.roomList .room {
+	width: 350px;
+}
+
+.roomList .go {
+	width: 71px;
+	text-align: center;
+}
+
+.inputTable th {
+	padding: 5px;
+}
+
+.inputTable input {
+	width: 330px;
+	height: 25px;
+}
+
+.chat-user {
+	font-weight: bold;
+	font-size: 16px;
+	display: inline-flex;
+	margin-right: 15px;
+}
+
+.chat-time {
+	color: #a9a9a9;
+	display: inline-flex;
+	width: 45%;
+}
+
+.chat-room-div {
+	padding: 5% 5%;
+	border-bottom: 1px #c3c3c399 solid;
+}
+
+.chat-room-div:hover {
+	cursor: pointer;
+}
+
+.chat-room-div img {
+	    width: 50px;
+	    height: 50px;
+}

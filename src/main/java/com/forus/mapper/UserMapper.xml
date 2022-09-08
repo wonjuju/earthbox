@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.forus.mapper.UserMapper">
+
+	<select id="userInfoList" resultType = "com.forus.domain.userInfoVO">
+		select * from user_tb
+	</select>
+
+
+	<select id="login" parameterType="com.forus.domain.userInfoVO" resultType="com.forus.domain.userInfoVO">
+		select * from user_tb where user_id=#{user_id}
+	</select>
+	
+	
+	<insert id="join" parameterType="com.forus.domain.userInfoVO">
+		insert into user_tb(user_id, user_pw, user_nick, user_email, user_addr) values(#{user_id},#{user_pw},#{user_nick},#{user_email},#{user_addr})
+	</insert>
+	
+	<select id="checkId"  resultType="String">
+		select user_id from user_tb where user_id=#{user_id}	
+	</select>
+ 	
+ 	
+ 	<!-- 구매시 point 차감 -->
+ 	<update id="PointUpdate" parameterType="com.forus.domain.userInfoVO">
+ 		update user_tb set user_point =user_point -#{user_point} where user_id =#{user_id}
+ 	</update>
+
+	<!-- 구매할때 회원 포인트 가져오기 -->
+	<select id="pointSelect" resultType="int">
+		select user_point from user_tb where user_id = #{user_id}
+	</select>
+
+
+
+
+
+</mapper>
